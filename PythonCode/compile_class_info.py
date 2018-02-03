@@ -1,43 +1,82 @@
 import os
 import pandas
-import numpy
 import glob
 
-#def main():
-filenames = collect_csv_files();
-isbad     = check_CSV_exceptions(filenames[0])
-print(filenames[0])
-print(isbad)
-# student_data = cat_data()
-# write_data()
-#return filename
-
+def main():
+    filenames = collect_csv_files()
+    allGoodCSVFiles = cat_data(filenames)
+    write_CSV(allGoodCSVFiles)
+    return 
 
 def collect_csv_files():
     csvLoc = get_CSV_folder() + "*.csv"
     filename = []
-    for CSVfile in glob.glob(csvLoc):
-        filename.append(CSVfile)
+    for csvFile in glob.glob(csvLoc):
+        filename.append(csvFile)
     return filename
 
-def cat_data():
-    pass
+def cat_data(filenames):
+    everyDataFrameArray = []  
+    expectedColumns = 5
+    camelCaseCount = 0
+    
+    for csvFile in filenames:
+        
+        readFile =  pandas.read_csv(csvFile, names=['FirstName', 'LastName', 'NetID', 'Github', 'TeamName'], skipinitialspace = True)
+    
+        if check_import_exceptions(csvFile):
+            continue
+        if bad_size(readFile, expectedColumns):
+            print(os.path.basename(csvFile) + " has wrong shape")
+            continue
+        if teamname_has_spaces(readFile):
+            print(os.path.basename(csvFile) + " team name contains a space")
+        if is_CamelCase:
+            camelCaseCount += 1   
+        
+        write_JSON(csvFile, readFile)
+        everyDataFrameArray.append(readFile)
+        
+    
+    print("Camel case count: {}".format(camelCaseCount)) 
+    
+    everyDataFrame = pandas.concat(everyDataFrameArray)
+    return everyDataFrame
 
-def check_CSV_exceptions(csvName):
-    name_exceptions = ["mlp6.csv"]  #can expand the list of bad files
+def check_import_exceptions(csvName):
+    name_exceptions = ["mlp6.csv", "everyone.csv"]  #can expand the list of bad files
     checkall = []
     for badnames in name_exceptions:
-        checkall.append(badnames in csvName)
+        checkall.append(badnames == os.path.basename(csvName))
     return any(checkall)
 
-def check_spaces():
+def bad_size(readFile, expectedSize):
+    isBadSize = readFile.size != expectedSize
+    return isBadSize
+
+def teamname_has_spaces(readFile):
+    hasSpace = readFile.loc[0].TeamName.find(" ") is not -1
+    return hasSpace
+
+def is_CamelCase(readFile):
+    isCamelCase = readFile.loc[0].TeamName.islower() is False and readFile.loc[0].TeamName.isupper() is False
+    return isCamelCase
+
+def write_CSV(concatDataFrame):
+    saveLoc = get_CSV_folder()
+    fileSaveName = "everyone.csv"
+    fullSavePath = os.path.join(saveLoc, fileSaveName)
+    
+    concatDataFrame.to_csv(fullSavePath, index_label = False, index = False)
     pass
 
-def count_CamelCase():
-    pass
-
-def write_data():
-    # CSV or JSON
+def write_JSON(csvFile, readFile):
+    saveLoc = get_JSON_folder()
+    importedFileName = os.path.basename(csvFile)
+    fileSaveName = importedFileName[0:-3] + ".json"
+    fullSavePath = os.path.join(saveLoc, fileSaveName)
+    
+    readFile.to_json(fullSavePath, orient = "records")
     pass
 
 def get_CSV_folder():
