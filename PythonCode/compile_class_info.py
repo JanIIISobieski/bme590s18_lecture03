@@ -3,23 +3,40 @@ import pandas
 import numpy
 import glob
 
-def main():
-    CSVloc = get_CSV_folder() + "*.csv"
-    print(CSVloc)
-        # filenames = collect_csv_files()
-        # student_data = cat_data()
-        # write_data()
+#def main():
+filenames = collect_csv_files();
+isbad     = check_CSV_exceptions(filenames[0])
+print(filenames[0])
+print(isbad)
+# student_data = cat_data()
+# write_data()
+#return filename
 
 
 def collect_csv_files():
-    CSVwildcard = "/*.csv"
-    #get_CSV_folder().
-    pass
+    csvLoc = get_CSV_folder() + "*.csv"
+    filename = []
+    for CSVfile in glob.glob(csvLoc):
+        filename.append(CSVfile)
+    return filename
 
 def cat_data():
     pass
 
-def write_():
+def check_CSV_exceptions(csvName):
+    name_exceptions = ["mlp6.csv"]  #can expand the list of bad files
+    checkall = []
+    for badnames in name_exceptions:
+        checkall.append(badnames in csvName)
+    return any(checkall)
+
+def check_spaces():
+    pass
+
+def count_CamelCase():
+    pass
+
+def write_data():
     # CSV or JSON
     pass
 
