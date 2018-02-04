@@ -25,6 +25,7 @@ def cat_data(filenames):
         readFile =  pandas.read_csv(csvFile, names=['FirstName', 'LastName', 'NetID', 'Github', 'TeamName'], skipinitialspace = True)
     
         if check_import_exceptions(csvFile):
+            print(os.path.basename(csvFile) + " is ignored")
             continue
         if bad_size(readFile, expectedColumns):
             print(os.path.basename(csvFile) + " has wrong shape")
@@ -36,10 +37,8 @@ def cat_data(filenames):
         
         write_JSON(csvFile, readFile)
         everyDataFrameArray.append(readFile)
-        
-    
-    print("Camel case count: {}".format(camelCaseCount)) 
-    
+
+    print("Camel case count: {}".format(camelCaseCount))
     everyDataFrame = pandas.concat(everyDataFrameArray)
     return everyDataFrame
 
@@ -68,7 +67,7 @@ def write_CSV(concatDataFrame):
     fullSavePath = os.path.join(saveLoc, fileSaveName)
     
     concatDataFrame.to_csv(fullSavePath, index_label = False, index = False)
-    pass
+    return
 
 def write_JSON(csvFile, readFile):
     saveLoc = get_JSON_folder()
@@ -77,7 +76,7 @@ def write_JSON(csvFile, readFile):
     fullSavePath = os.path.join(saveLoc, fileSaveName)
     
     readFile.to_json(fullSavePath, orient = "records")
-    pass
+    return
 
 def get_CSV_folder():
     scriptDirectory = os.path.dirname(__file__)
